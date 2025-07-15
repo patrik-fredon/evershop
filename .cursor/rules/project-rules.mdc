@@ -1,0 +1,28 @@
+---
+alwaysApply: true
+---
+Project: Evershop Adult Products E-commerce (Errection.org)
+Language: Czech (primary), English (secondary)
+Framework: React, Node.js, PostgreSQL, Redis
+Deployment: Docker-compose on Coolify
+
+Specific Requirements:
+- Adult products compliance (age verification)
+- Gentleman's shop styling (sophisticated, humorous, bold)
+- Multi-language support (Czech/English)
+- SEO optimization for both languages
+- Privacy-focused design
+- Performance optimization
+- Security-first approach
+
+Code Standards:
+- Use TypeScript interfaces for all data structures
+- Implement proper error boundaries in React
+- Use GraphQL for API queries
+- Implement proper caching with Redis
+- Use environment variables for all configuration
+- Follow EverShop extension patterns
+- Use proper database migrations
+- Implement comprehensive testing
+- Use semantic commit messages
+- Follow accessibility guidelines (WCAG 2.1)

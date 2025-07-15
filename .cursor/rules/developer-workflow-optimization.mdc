@@ -1,0 +1,446 @@
+---
+alwaysApply: true
+---
+### 1. Agent Mode Best Practices
+- Use Agent mode for complex multi-file changes
+- Enable YOLO mode for safe operations (build, test, mkdir)
+- Break complex tasks into smaller, manageable pieces
+- Use clear, detailed prompts
+- Leverage context with @ file references
+- Use conversation queuing for multiple tasks
+
+### 2. Task Breakdown Strategy
+```
+Example Task: "Implement Czech language support"
+
+Break down into:
+1. Create Czech translation files
+2. Implement language detection middleware
+3. Update React components for translations
+4. Configure database for Czech content
+5. Set up Czech URL routing
+6. Implement Czech-specific formatting
+7. Create Czech SEO meta tags
+8. Test language switching functionality
+```
+
+### 3. File Organization for Cursor
+```
+evershop/
+├── .cursor/
+│   ├── rules/
+│   │   ├── typescript.mdc
+│   │   ├── react.mdc
+│   │   ├── czech-localization.mdc
+│   │   └── adult-products.mdc
+│   └── instructions.md
+├── .cursorrules
+├── .cursorignore
+└── src/
+    ├── extensions/
+    │   ├── czech-localization/
+    │   ├── adult-products-compliance/
+    │   └── gentleman-theme/
+    ├── translations/
+    │   ├── cs/
+    │   └── en/
+    └── themes/
+        └── gentleman-shop/
+```
+
+### 4. Context Management
+```
+Use @ references for:
+- @package.json for dependencies
+- @docker-compose.yml for deployment
+- @translations/cs/ for Czech content
+- @translations/en/ for English content
+- @config/default.json for configuration
+- @extensions/ for custom functionality
+```
+
+## Code Quality Standards
+
+### 1. TypeScript Implementation
+```typescript
+// Example: Product interface
+interface Product {
+  id: string;
+  name: {
+    cs: string;
+    en: string;
+  };
+  description: {
+    cs: string;
+    en: string;
+  };
+  price: number;
+  currency: 'CZK' | 'USD' | 'EUR';
+  category: ProductCategory;
+  isAgeRestricted: boolean;
+  isVisible: boolean;
+  seoMetadata: {
+    cs: SEOMetadata;
+    en: SEOMetadata;
+  };
+}
+```
+
+### 2. React Component Standards
+```typescript
+// Example: Multi-language component
+interface ProductCardProps {
+  product: Product;
+  language: 'cs' | 'en';
+}
+
+const ProductCard: React.FC<ProductCardProps> = ({ product, language }) => {
+  const { t } = useTranslation(language);
+
+  return (
+    <div className="product-card gentleman-theme">
+      <h3>{product.name[language]}</h3>
+      <p>{product.description[language]}</p>
+      <span className="price">{formatPrice(product.price, product.currency)}</span>
+      <button className="btn-primary">{t('addToCart')}</button>
+    </div>
+  );
+};
+```
+
+### 3. Error Handling Pattern
+```typescript
+// Example: Error boundary implementation
+class AdultProductsErrorBoundary extends React.Component<
+  { children: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(error: Error) {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+    console.error('Adult products error:', error, errorInfo);
+    // Log to monitoring service
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return <div>Something went wrong with adult products display.</div>;
+    }
+
+    return this.props.children;
+  }
+}
+```
+
+## Performance Optimization
+
+### 1. Redis Caching Strategy
+```typescript
+// Example: Product caching
+class ProductCache {
+  private redis: Redis;
+  private ttl = 3600; // 1 hour
+
+  async getProduct(id: string, language: string): Promise<Product | null> {
+    const cacheKey = `product:${id}:${language}`;
+    const cached = await this.redis.get(cacheKey);
+
+    if (cached) {
+      return JSON.parse(cached);
+    }
+
+    const product = await this.fetchProductFromDb(id, language);
+    if (product) {
+      await this.redis.setex(cacheKey, this.ttl, JSON.stringify(product));
+    }
+
+    return product;
+  }
+}
+```
+
+### 2. Database Query Optimization
+```typescript
+// Example: Optimized product query
+const getProductsByCategory = async (
+  category: string,
+  language: string,
+  page: number = 1,
+  limit: number = 20
+) => {
+  const offset = (page - 1) * limit;
+
+  return await db.query(`
+    SELECT
+      p.id,
+      p.name->>$1 as name,
+      p.description->>$1 as description,
+      p.price,
+      p.currency,
+      p.image_url
+    FROM products p
+    WHERE p.category = $2
+      AND p.is_visible = true
+      AND p.is_age_restricted = true
+    ORDER BY p.created_at DESC
+    LIMIT $3 OFFSET $4
+  `, [language, category, limit, offset]);
+};
+```
+
+## SEO Optimization
+
+### 1. Meta Tags Implementation
+```typescript
+// Example: SEO meta tags component
+interface SEOMetaProps {
+  title: string;
+  description: string;
+  keywords: string[];
+  language: 'cs' | 'en';
+  canonical: string;
+}
+
+const SEOMeta: React.FC<SEOMetaProps> = ({ title, description, keywords, language, canonical }) => {
+  return (
+    <Helmet>
+      <html lang={language} />
+      <title>{title}</title>
+      <meta name="description" content={description} />
+      <meta name="keywords" content={keywords.join(', ')} />
+      <link rel="canonical" href={canonical} />
+      <meta property="og:title" content={title} />
+      <meta property="og:description" content={description} />
+      <meta property="og:url" content={canonical} />
+      <meta property="og:type" content="website" />
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={title} />
+      <meta name="twitter:description" content={description} />
+    </Helmet>
+  );
+};
+```
+
+### 2. Structured Data Implementation
+```typescript
+// Example: Product structured data
+const ProductStructuredData: React.FC<{ product: Product; language: string }> = ({ product, language }) => {
+  const structuredData = {
+    "@context": "https://schema.org/",
+    "@type": "Product",
+    "name": product.name[language],
+    "description": product.description[language],
+    "image": product.imageUrl,
+    "offers": {
+      "@type": "Offer",
+      "price": product.price,
+      "priceCurrency": product.currency,
+      "availability": "https://schema.org/InStock"
+    },
+    "brand": {
+      "@type": "Brand",
+      "name": "Errection.org"
+    }
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+    />
+  );
+};
+```
+
+## Security Implementation
+
+### 1. Age Verification System
+```typescript
+// Example: Age verification middleware
+const ageVerificationMiddleware = (req: Request, res: Response, next: NextFunction) => {
+  const ageVerified = req.session?.ageVerified;
+  const userAgent = req.get('User-Agent');
+
+  // Log access attempt
+  console.log(`Age verification check: ${req.ip}, ${userAgent}`);
+
+  if (!ageVerified && req.path !== '/age-verification') {
+    return res.redirect('/age-verification');
+  }
+
+  next();
+};
+```
+
+### 2. Privacy-Focused Data Handling
+```typescript
+// Example: Privacy-focused user data
+interface UserData {
+  id: string;
+  email: string; // Encrypted
+  preferences: {
+    language: 'cs' | 'en';
+    currency: string;
+    marketing: boolean;
+  };
+  // No sensitive personal data stored
+}
+
+const encryptUserData = (data: any): string => {
+  return crypto.AES.encrypt(JSON.stringify(data), process.env.ENCRYPTION_KEY).toString();
+};
+```
+
+## Deployment Configuration
+
+### 1. Docker-compose for Coolify
+```yaml
+version: '3.8'
+services:
+  evershop:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    environment:
+      - NODE_ENV=production
+      - DB_HOST=postgres
+      - DB_PORT=5432
+      - DB_NAME=evershop
+      - DB_USER=postgres
+      - DB_PASSWORD=${DB_PASSWORD}
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379
+      - REDIS_PASSWORD=${REDIS_PASSWORD}
+      - ENCRYPTION_KEY=${ENCRYPTION_KEY}
+      - SESSION_SECRET=${SESSION_SECRET}
+    depends_on:
+      - postgres
+      - redis
+    restart: unless-stopped
+    networks:
+      - evershop_network
+
+  postgres:
+    image: postgres:16
+    environment:
+      - POSTGRES_DB=evershop
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    restart: unless-stopped
+    networks:
+      - evershop_network
+
+  redis:
+    image: redis:7-alpine
+    command: redis-server --requirepass ${REDIS_PASSWORD}
+    volumes:
+      - redis_data:/data
+    restart: unless-stopped
+    networks:
+      - evershop_network
+
+volumes:
+  postgres_data:
+  redis_data:
+
+networks:
+  evershop_network:
+    driver: bridge
+```
+
+## Testing Strategy
+
+### 1. Test-Driven Development
+```typescript
+// Example: Product service tests
+describe('ProductService', () => {
+  it('should return Czech product data', async () => {
+    const product = await ProductService.getProduct('123', 'cs');
+    expect(product.name).toBe('Český název produktu');
+    expect(product.description).toContain('český popis');
+  });
+
+  it('should verify age restriction', async () => {
+    const product = await ProductService.getProduct('123', 'cs');
+    expect(product.isAgeRestricted).toBe(true);
+  });
+});
+```
+
+### 2. Integration Tests
+```typescript
+// Example: API integration tests
+describe('Product API', () => {
+  it('should require age verification', async () => {
+    const response = await request(app)
+      .get('/api/products')
+      .expect(302)
+      .expect('Location', '/age-verification');
+  });
+
+  it('should return products after age verification', async () => {
+    const agent = request.agent(app);
+    await agent.post('/age-verification').send({ age: 25 });
+
+    const response = await agent
+      .get('/api/products')
+      .expect(200);
+
+    expect(response.body.products).toHaveLength(20);
+  });
+});
+```
+
+## Monitoring and Logging
+
+### 1. Application Monitoring
+```typescript
+// Example: Performance monitoring
+const performanceMonitor = (req: Request, res: Response, next: NextFunction) => {
+  const startTime = Date.now();
+
+  res.on('finish', () => {
+    const duration = Date.now() - startTime;
+    console.log(`${req.method} ${req.path} - ${res.statusCode} - ${duration}ms`);
+
+    // Send to monitoring service
+    if (duration > 1000) {
+      console.warn(`Slow request: ${req.path} took ${duration}ms`);
+    }
+  });
+
+  next();
+};
+```
+
+### 2. Error Logging
+```typescript
+// Example: Error logging
+const errorLogger = (error: Error, req: Request, res: Response, next: NextFunction) => {
+  const errorData = {
+    message: error.message,
+    stack: error.stack,
+    url: req.url,
+    method: req.method,
+    ip: req.ip,
+    userAgent: req.get('User-Agent'),
+    timestamp: new Date().toISOString()
+  };
+
+  console.error('Application error:', errorData);
+
+  // Send to error monitoring service
+  // errorMonitoring.captureException(error, errorData);
+
+  next(error);
+};
+```
