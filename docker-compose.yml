@@ -2,40 +2,80 @@ version: '3.8'
 
 services:
   app:
-    image: evershop/evershop:latest
-    restart: always
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
     environment:
+      NODE_ENV: production
       DB_HOST: database
       DB_PORT: 5432
-      DB_PASSWORD: postgres
-      DB_USER: postgres
-      DB_NAME: postgres
+      DB_PASSWORD: ${DB_PASSWORD:-postgres}
+      DB_USER: ${DB_USER:-postgres}
+      DB_NAME: ${DB_NAME:-evershop}
+      REDIS_HOST: redis
+      REDIS_PORT: 6379
+      REDIS_PASSWORD: ${REDIS_PASSWORD:-redis123}
+      SESSION_SECRET: ${SESSION_SECRET:-errection-session-secret}
+      ENCRYPTION_KEY: ${ENCRYPTION_KEY:-errection-encryption-key}
     networks:
-      - myevershop
+      - evershop_network
     depends_on:
-      - database
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
     ports:
-      - 3000:3000
-  
-  #The postgres database: 
+      - "3000:3000"
+    volumes:
+      - ./config:/app/config
+      - ./translations:/app/translations
+      - ./media:/app/media
+
+  # PostgreSQL database for Evershop
   database:
     image: postgres:16
     restart: unless-stopped
     volumes:
-      - postgres-data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql/data
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: ${DB_PASSWORD:-postgres}
+      POSTGRES_USER: ${DB_USER:-postgres}
+      POSTGRES_DB: ${DB_NAME:-evershop}
     ports:
-      - "5432:5432"
+      - "5435:5432"
     networks:
-      - myevershop
+      - evershop_network
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USER:-postgres}"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+
+  # Redis for caching and session storage
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: redis-server --requirepass ${REDIS_PASSWORD:-redis123} --appendonly yes
+    volumes:
+      - redis_data:/data
+    ports:
+      - "6373:6379"
+    networks:
+      - evershop_network
+    healthcheck:
+      test: ["CMD", "redis-cli", "--raw", "incr", "ping"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
 
 networks:
-  myevershop:
-    name: MyEverShop
+  evershop_network:
+    name: ErrectionOrg
     driver: bridge
 
 volumes:
-  postgres-data:
+  postgres_data:
+    name: errection_postgres_data
+  redis_data:
+    name: errection_redis_data

@@ -1,108 +1,289 @@
-<p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
-<p align="center">
-<img width="60" height="68" alt="EverShop Logo" src="https://raw.githubusercontent.com/evershopcommerce/evershop/dev/.github/images/logo-green.png"/>
-</p>
-<p align="center">
-  <h1 align="center">EverShop</h1>
-</p>
-<h4 align="center">
-    <a href="https://evershop.io/docs/development/getting-started/introduction">Documentation</a> |
-    <a href="https://demo.evershop.io/">Demo</a>
-</h4>
+# Errection.org
 
-<p align="center">
-  <img src="https://github.com/evershopcommerce/evershop/actions/workflows/build_test.yml/badge.svg" alt="Github Action">
-  <a href="https://twitter.com/evershopjs">
-    <img alt="Twitter Follow" src="https://img.shields.io/twitter/follow/evershopjs?style=social">
-  </a>
-  <a href="https://discord.gg/GSzt7dt7RM">
-    <img src="https://img.shields.io/discord/757179260417867879?label=discord" alt="Discord">
-  </a>
-  <a href="https://opensource.org/licenses/GPL-3.0">
-    <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" alt="License">
-  </a>
-</p>
+> **Sophisticated pleasures for the modern gentleman**
 
-<p align="center">
-<img alt="EverShop" width="950" src="https://raw.githubusercontent.com/evershopcommerce/evershop/dev/.github/images/banner.png"/>
-</p>
+A premium Czech/English bilingual e-commerce platform built on EverShop, designed specifically for discerning gentlemen seeking quality adult products. Features sophisticated styling, comprehensive age verification, and privacy-focused architecture.
 
-## Introduction
+## 🎭 Features
 
-EverShop is a modern, TypeScript-first eCommerce platform built with GraphQL and React. Designed for developers, it offers essential commerce features in a modular, fully customizable architecture—perfect for building tailored shopping experiences with confidence and speed.
+### 🇨🇿 Bilingual Experience
+- **Primary Language**: Czech (sophisticated, witty, gentleman's club tone)
+- **Secondary Language**: English (refined and bold)
+- **Dynamic Language Switching**: Seamless Czech/English toggle
+- **Localized Content**: All text crafted with sophisticated humor and elegance
 
-## Installation Using Docker
+### 🔒 Adult Products Compliance
+- **Enhanced Age Gate**: Sophisticated 18+ verification system
+- **Privacy-First Design**: Discreet packaging and confidential service
+- **GDPR Compliant**: European privacy standards
+- **Secure Checkout**: End-to-end encryption for sensitive data
 
+### 💳 Czech Market Ready
+- **Currency**: Czech Koruna (CZK) as default
+- **Timezone**: Europe/Prague
+- **Local Payment Methods**: Czech banking integration ready
+- **Czech Shipping**: Local delivery options
 
-You can get started with EverShop in minutes by using the Docker image. The Docker image is a great way to get started with EverShop without having to worry about installing dependencies or configuring your environment.
+### 🎨 Gentleman's Boutique Aesthetic
+- **Sophisticated UI**: Elegant, slightly mischievous design
+- **Premium Experience**: Luxurious feel with witty touches
+- **Responsive Design**: Perfect on all devices
+- **Accessibility**: WCAG 2.1 compliant
 
-```bash
-curl -sSL https://raw.githubusercontent.com/evershopcommerce/evershop/main/docker-compose.yml > docker-compose.yml
-docker-compose up -d
+### ⚡ Performance & Scalability
+- **Redis Caching**: Lightning-fast page loads
+- **PostgreSQL**: Robust data management
+- **Docker Ready**: Easy deployment on Coolify
+- **SEO Optimized**: Bilingual search engine optimization
+
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- PostgreSQL 16+
+- Redis 7+
+- Docker & Docker Compose (recommended)
+
+### Docker Deployment (Recommended)
+
+1. **Clone and Configure**
+   ```bash
+   git clone <repository-url> errection-org
+   cd errection-org
+   cp .env.example .env
+   # Edit .env with your configuration
+   ```
+
+2. **Deploy with Docker Compose**
+   ```bash
+   docker-compose up -d
+   ```
+
+3. **Access Your Store**
+   - Frontend: http://localhost:3000
+   - Admin: http://localhost:3000/admin
+
+### Manual Installation
+
+1. **Install Dependencies**
+   ```bash
+   npm install
+   ```
+
+2. **Configure Database**
+   ```bash
+   # Setup PostgreSQL database
+   createdb evershop
+
+   # Copy configuration
+   cp config/default.json.example config/default.json
+   # Edit config/default.json with your settings
+   ```
+
+3. **Run Initial Setup**
+   ```bash
+   npm run setup
+   ```
+
+4. **Start Development**
+   ```bash
+   npm run dev
+   ```
+
+## 🏗️ Architecture
+
+### Translation System
+```
+translations/
+├── cs/                 # Czech translations (primary)
+│   ├── catalog.csv
+│   ├── account.csv
+│   ├── checkout.csv
+│   ├── agegate.csv
+│   └── errection.csv   # Custom Errection.org content
+└── en/                 # English translations
+    ├── catalog.csv
+    ├── account.csv
+    ├── checkout.csv
+    ├── agegate.csv
+    └── errection.csv
 ```
 
-For the full installation guide, please refer to our [Installation guide](https://evershop.io/docs/development/getting-started/installation-guide).
+### Extensions Structure
+```
+extensions/
+├── agegate/           # Enhanced age verification
+│   ├── src/
+│   │   ├── pages/     # Age gate UI components
+│   │   ├── api/       # Age verification logic
+│   │   └── components/# Reusable components
+│   └── package.json
+└── (other extensions as needed)
+```
 
-## Documentation
+### Configuration
+```json
+{
+  "shop": {
+    "language": "cs",      // Czech as primary
+    "currency": "CZK",     // Czech Koruna
+    "timezone": "Europe/Prague"
+  },
+  "system": {
+    "extensions": [
+      {
+        "name": "agegate",
+        "resolve": "extensions/agegate",
+        "enabled": true,
+        "priority": 10
+      }
+    ]
+  }
+}
+```
 
-- [Installation guide](https://evershop.io/docs/development/getting-started/installation-guide).
+## 🔧 Customization
 
-- [Extension development](https://evershop.io/docs/development/module/create-your-first-extension).
+### Adding New Translations
 
-- [Theme development](https://evershop.io/docs/development/theme/theme-overview).
+1. **Czech Content** (`translations/cs/your-file.csv`):
+   ```csv
+   English Text, Český text s rafinovaným humorem
+   Welcome, Vítejte v našem světě
+   ```
 
+2. **English Content** (`translations/en/your-file.csv`):
+   ```csv
+   English Text, Sophisticated English equivalent
+   Welcome, Welcome to our exclusive world
+   ```
 
-## Demo
+### Gentleman's Club Styling
 
-Explore our demo store.
+The platform uses a sophisticated design language:
+- **Colors**: Elegant dark themes with gold accents
+- **Typography**: Refined fonts with character
+- **Humor**: Witty, bold, yet always tasteful
+- **Experience**: Luxurious but approachable
 
-<p align="left">
-  <a href="https://demo.evershop.io/admin" target="_blank">
-    <img alt="evershop-backend-demo" height="35" alt="EverShop Admin Demo" src="https://raw.githubusercontent.com/evershopcommerce/evershop/dev/.github/images/evershop-demo-back.png"/>
-  </a>
-  <a href="https://demo.evershop.io/" target="_blank">
-    <img alt="evershop-store-demo" height="35" alt="EverShop Store Demo" src="https://raw.githubusercontent.com/evershopcommerce/evershop/dev/.github/images/evershop-demo-front.png"/>
-  </a>
-</p>
-<b>Demo user:</b>
+### Age Verification Enhancement
 
-Email: demo@evershop.io<br/>
-Password: 123456
+The age gate system includes:
+- Elegant UI with Errection.org branding
+- Multi-language support
+- Privacy messaging
+- Sophisticated error handling
 
-## Support
+## 🛡️ Security & Privacy
 
-If you like my work, feel free to:
+### Data Protection
+- **Encryption**: All sensitive data encrypted at rest
+- **Privacy**: No unnecessary data collection
+- **Anonymity**: Discreet service guarantees
+- **GDPR**: Full European compliance
 
-- ⭐ this repository. It helps.
-- [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)][tweet] about EverShop. Thank you!
+### Age Verification
+- **Robust Checking**: Multiple validation layers
+- **Session Management**: Secure age verification storage
+- **Privacy Focused**: Minimal data collection
 
-[tweet]: https://twitter.com/intent/tweet?url=https%3A%2F%2Fgithub.com%2Fevershopcommerce%2Fevershop&text=Awesome%20React%20Ecommerce%20Project&hashtags=react,ecommerce,expressjs,graphql
+### Payment Security
+- **PCI Compliance**: Secure payment processing
+- **Multiple Methods**: Czech and international options
+- **Fraud Protection**: Advanced security measures
 
-## Contributing
+## 🌍 SEO & Marketing
 
-EverShop is an open-source project. We are committed to a fully transparent development process and appreciate highly any contributions. Whether you are helping us fix bugs, proposing new features, improving our documentation or spreading the word - we would love to have you as part of the EverShop community.
+### Bilingual SEO
+- **Hreflang**: Proper language targeting
+- **Meta Tags**: Czech and English optimization
+- **Structured Data**: Rich snippets support
+- **URL Structure**: Language-specific URLs
 
-### Ask a question about EverShop
+### Content Strategy
+- **Czech Market**: Local humor and cultural references
+- **English Market**: International sophistication
+- **Brand Voice**: Consistent gentleman's club tone
+- **Keywords**: Adult products, luxury, discretion
 
-You can ask questions, and participate in discussions about EverShop-related topics in the EverShop Discord channel.
+## 📱 Mobile Experience
 
-<a href="https://discord.gg/GSzt7dt7RM"><img src="https://raw.githubusercontent.com/evershopcommerce/evershop/dev/.github/images/discord_banner_github.svg" /></a>
+- **Responsive Design**: Perfect on all devices
+- **Touch Optimized**: Smooth mobile interactions
+- **Fast Loading**: Optimized for mobile networks
+- **Accessibility**: Screen reader friendly
 
-### Create a bug report
+## 🔄 Development Workflow
 
-If you see an error message or run into an issue, please [create bug report](https://github.com/evershopcommerce/evershop/issues/new). This effort is valued and it will help all EverShop users.
+### Code Standards
+- **TypeScript**: Type-safe development
+- **React**: Modern component architecture
+- **GraphQL**: Efficient data fetching
+- **Testing**: Comprehensive test coverage
 
+### Deployment
+- **Docker**: Containerized deployment
+- **Coolify**: Streamlined hosting
+- **CI/CD**: Automated testing and deployment
+- **Monitoring**: Performance and error tracking
 
-### Submit a feature request
+## 📊 Analytics & Monitoring
 
-If you have an idea, or you're missing a capability that would make development easier and more robust, please [Submit feature request](https://github.com/evershopcommerce/evershop/issues/new).
+### Performance Metrics
+- **Page Load**: < 2 seconds target
+- **Cache Hit Rate**: > 80% target
+- **Uptime**: 99.9% availability
+- **Error Rate**: < 0.1% target
 
-If a similar feature request already exists, don't forget to leave a "+1".
-If you add some more information such as your thoughts and vision about the feature, your comments will be embraced warmly :)
+### Business Intelligence
+- **Customer Analytics**: Shopping behavior insights
+- **Product Performance**: Sales and engagement metrics
+- **Geographic Data**: Czech vs. international markets
+- **Privacy Compliant**: Anonymous data collection
 
+## 🤝 Contributing
 
-Please refer to our [Contribution Guidelines](./CONTRIBUTING.md) and [Code of Conduct](./CODE_OF_CONDUCT.md).
+### Guidelines
+1. **Code Quality**: Follow existing patterns
+2. **Translation**: Maintain sophisticated tone
+3. **Testing**: Comprehensive test coverage
+4. **Documentation**: Clear and helpful docs
 
-## License
+### Translation Guidelines
+- **Czech**: Sophisticated, witty, slightly mischievous
+- **English**: Refined, bold, internationally appealing
+- **Consistency**: Maintain brand voice across languages
+- **Cultural Sensitivity**: Appropriate for adult content
 
-[GPL-3.0 License](https://github.com/evershopcommerce/evershop/blob/main/LICENSE)
+## 📞 Support
+
+### Documentation
+- **API Docs**: Complete GraphQL schema
+- **Component Library**: UI component documentation
+- **Translation Guide**: Content creation guidelines
+- **Deployment Guide**: Production setup instructions
+
+### Community
+- **Issues**: GitHub issue tracking
+- **Discussions**: Feature requests and ideas
+- **Wiki**: Extended documentation
+- **Changelog**: Version history and updates
+
+## 📄 Legal & Compliance
+
+### Licenses
+- **EverShop**: GNU General Public License 3.0
+- **Extensions**: Individual license terms
+- **Content**: Proprietary Errection.org content
+
+### Compliance
+- **Age Verification**: Legal adult content requirements
+- **GDPR**: European privacy regulations
+- **Czech Law**: Local e-commerce regulations
+- **International**: Cross-border commerce compliance
+
+---
+
+**Errection.org** - *Where sophistication meets satisfaction*
+
+> Built with ❤️ in Prague, crafted for gentlemen worldwide
